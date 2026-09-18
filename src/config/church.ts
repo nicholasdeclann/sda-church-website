@@ -57,7 +57,7 @@ export interface ChurchConfig {
 
   /** Social media (Instagram). */
   instagram: {
-    /** Handle as displayed, e.g. "@gmahkbsd". */
+    /** Handle as displayed, e.g. "@yourchurch". */
     handle: string;
     /** Full profile URL. */
     url: string;
@@ -73,10 +73,13 @@ export interface ChurchConfig {
   sheets: {
     /**
      * Worship schedule (jadwal pelayanan) — the sheet that lists who serves
-     * in which role for each Saturday.
+     * in which role for each Saturday. A new spreadsheet is used each quarter,
+     * so update both `sheetId` and `gid` (the participants tab) accordingly.
      */
     schedule: {
       sheetId: string;
+      /** gid of the participants tab within the quarter's spreadsheet. */
+      gid: string;
     };
     /**
      * Kertas Acara / Lagu Sion sheet — holds the worship order details and
@@ -90,9 +93,16 @@ export interface ChurchConfig {
       /** gid of the "Lagu Sion" (hymnal lookup) tab. */
       laguSionGid: string;
     };
-    /** Birthday (ulang tahun) sheet — congregation member birthdays. */
+    /**
+     * Birthday (ulang tahun) sheet — congregation member birthdays. The data
+     * is split across multiple tabs (roughly one per month, though rows are
+     * not strictly grouped by birth month). All tabs are fetched and merged;
+     * each person's birth month/day is read from their own row columns.
+     */
     birthdays: {
       sheetId: string;
+      /** gids of every tab that holds birthday rows. */
+      tabGids: string[];
     };
   };
 
@@ -116,6 +126,18 @@ export interface ChurchConfig {
     };
     /** Static text shown for the "Pengumuman" slot in Sekolah Sabat. */
     pengumumanRole: string;
+    /**
+     * Downloadable JPG export of the worship order. The app proxies Google
+     * Sheets' native PDF export of the given cell range and converts it to a
+     * JPG in the browser. Requires the liturgy spreadsheet to be publicly
+     * viewable ("Anyone with the link").
+     */
+    export: {
+      sheetId: string;
+      gid: string;
+      /** Cell range to export, e.g. "B10:P70". */
+      range: string;
+    };
     /**
      * Keywords used to classify rows in the schedule sheet into sections.
      * All comparisons are case-insensitive. Adjust these to match the exact
@@ -149,59 +171,79 @@ export interface ChurchConfig {
   };
 }
 
+// ---------------------------------------------------------------------------
+//  EDIT THE VALUES BELOW FOR YOUR CHURCH.
+//
+//  Placeholders like "YOUR_..._SHEET_ID" must be replaced with your own data.
+//  See README.md for a field-by-field walkthrough and SETUP.md for the exact
+//  Google Sheets layout the app expects.
+// ---------------------------------------------------------------------------
 export const churchConfig: ChurchConfig = {
-  name: "GMAHK BSD",
-  shortName: "GMAHK BSD",
-  description: "A simple homepage built with Next.js and TypeScript",
+  // --- Branding -----------------------------------------------------------
+  name: "Your Church Name",
+  shortName: "Your Church",
+  description: "Official website of Your Church.",
 
-  welcomeHeading: "Selamat Datang di GMAHK BSD",
+  welcomeHeading: "Selamat Datang di Your Church",
   welcomeSubtitle:
     "Bergabunglah dengan kami dalam perjalanan iman, komunitas, dan pelayanan.",
 
+  // --- Assets (files inside public/assets/images/) ------------------------
   assets: {
     logo: "logo.svg",
     zoomLogo: "zoom-logo.svg",
     birthdayHeader: "balloons.svg",
   },
 
+  // --- Homepage worship service cards -------------------------------------
   services: [
     { name: "Rabu Malam & Vesper (Online)", time: "07.00 WIB" },
     { name: "Kebaktian Sabat (Hybrid)", time: "09.00 WIB" },
   ],
 
+  // --- Zoom / online meeting ----------------------------------------------
   zoom: {
-    id: "987 654 1988",
-    password: "1988",
-    url: "https://us02web.zoom.us/j/9876541988?pwd=L21vRW5sV3RpZmI3d2lHOVNUWGJldz09",
+    id: "000 0000 0000",
+    password: "000000",
+    url: "https://zoom.us/j/0000000000",
   },
 
+  // --- Social media --------------------------------------------------------
   instagram: {
-    handle: "@gmahkbsd",
-    url: "https://www.instagram.com/gmahkbsd/",
+    handle: "@yourchurch",
+    url: "https://www.instagram.com/yourchurch/",
   },
 
-  mapsEmbedUrl:
-    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d540.1432901599097!2d106.68286777096924!3d-6.303682256829734!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69e52cb2eef9f1%3A0xec9eb7343cb6b8cd!2sGMAHK%20Bumi%20Serpong%20Damai!5e0!3m2!1sen!2sid!4v1770132548503!5m2!1sen!2sid",
+  // --- Google Maps embed (the `src` of the "Embed a map" iframe) ----------
+  mapsEmbedUrl: "https://www.google.com/maps/embed?pb=YOUR_MAPS_EMBED",
 
-  pengumumanEmbedUrl:
-    "https://www.canva.com/design/DAG-9nAgcSE/Ri8PyLxmRovXS8iWkST9aQ/view?embed",
+  // --- Announcements (Canva design embed URL) -----------------------------
+  pengumumanEmbedUrl: "https://www.canva.com/design/YOUR_CANVA_ID/view?embed",
 
+  // --- Google Sheets data sources (must be publicly viewable) -------------
   sheets: {
     schedule: {
-      sheetId: "1P4tHksUSd-cYVcU-mYQYvutL-c1S-V2Nj1hlb-yR28w",
+      sheetId: "YOUR_SCHEDULE_SHEET_ID",
+      gid: "0",
     },
     liturgy: {
-      sheetId: "1uW-CwZxGJ9Jfqv78pUc-4iE9fqgrV17eV9Ws_FEE5Ns",
-      kertasAcaraGid: "1587228396",
-      laguSionGid: "1174681408",
+      sheetId: "YOUR_LITURGY_SHEET_ID",
+      kertasAcaraGid: "0",
+      laguSionGid: "0",
     },
     birthdays: {
-      sheetId: "1TM1e4w1mhgZvXo5JBcihACXPgrmFBKX91_qAp6wbU_Q",
+      sheetId: "YOUR_BIRTHDAYS_SHEET_ID",
+      // One gid per tab that holds birthday rows (add or remove as needed).
+      tabGids: ["0"],
     },
   },
 
+  // --- Kertas Acara liturgy ------------------------------------------------
   kertasAcara: {
+    // "LSEL" = Lagu Sion Edisi Lengkap (Indonesian SDA hymnal). Change to your
+    // hymnal's abbreviation.
     hymnalPrefix: "LSEL",
+    // Hymn numbers sung at fixed points in the worship order.
     fixedHymns: {
       laguPartisipanKhotbah: "421",
       laguSambutan1: "21",
@@ -209,6 +251,15 @@ export const churchConfig: ChurchConfig = {
       laguSambutan2: "168",
     },
     pengumumanRole: "Dept. Komunikasi, Ketua Jemaat",
+    // Downloadable JPG of the worship order (the "Unduh Kertas Acara" button).
+    export: {
+      sheetId: "YOUR_LITURGY_SHEET_ID",
+      gid: "0",
+      range: "B10:P70",
+    },
+    // Keywords that classify rows of the schedule sheet into sections.
+    // These defaults follow common Indonesian SDA conventions; adjust to your
+    // sheet's exact row labels. See SETUP.md.
     parsing: {
       skipRoleKeywords: ["penyedia potluck", "koordinator"],
       ssSectionMarker: "DEWASA",
