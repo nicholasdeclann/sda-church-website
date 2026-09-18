@@ -1,6 +1,6 @@
 /**
  * Resolve a path to a static asset inside the `public/` directory, accounting
- * for the configured `basePath` (e.g. "/gmahkbsd-next" on GitHub Pages).
+ * for the configured `basePath` (e.g. "/your-repo-name" on GitHub Pages).
  *
  * The base path is read from `NEXT_PUBLIC_BASE_PATH` at build time so that each
  * fork only needs to set an environment variable instead of editing source.
